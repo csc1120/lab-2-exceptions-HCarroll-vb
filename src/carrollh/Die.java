@@ -14,11 +14,11 @@ public class Die {
     /**
      * Constant for min sides
      */
-    private final int MIN_SIDES = 2;
+    public final int MIN_SIDES = 2;
     /**
      * Constant for max sides
      */
-    private final int MAX_SIDES = 100;
+    public final int MAX_SIDES = 100;
 
     private int currentValue;
     private int numSides;
