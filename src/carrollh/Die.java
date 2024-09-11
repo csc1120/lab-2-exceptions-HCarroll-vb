@@ -11,8 +11,14 @@ package carrollh;
  * Die class used for each individual die.
  */
 public class Die {
-    public final int MIN_SIDES = 2;
-    public final int MAX_SIDES = 100;
+    /**
+     * Constant for min sides
+     */
+    private final int MIN_SIDES = 2;
+    /**
+     * Constant for max sides
+     */
+    private final int MAX_SIDES = 100;
 
     private int currentValue;
     private int numSides;
@@ -36,11 +42,15 @@ public class Die {
      * @return the current value or DieNotRolledException
      */
     public int getCurrentValue(){
-        try {
-
-        } catch (DieNotRolledException e) {
+        try{
+            if(currentValue <= numSides && currentValue > 0){
+                return currentValue;
+            }
+        } catch(DieNotRolledException e){
             e.getMessage();
         }
+        currentValue = 0;
+        return 0;
     }
 
     /**
