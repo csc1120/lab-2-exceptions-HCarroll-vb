@@ -44,7 +44,9 @@ public class Die {
     public int getCurrentValue(){
         try{
             if(currentValue <= numSides && currentValue > 0){
-                return currentValue;
+                int value = currentValue;
+                currentValue = 0;
+                return value;
             }
         } catch(DieNotRolledException e){
             e.getMessage();
