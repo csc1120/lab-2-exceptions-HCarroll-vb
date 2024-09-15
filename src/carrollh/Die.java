@@ -14,11 +14,11 @@ public class Die {
     /**
      * Constant for min sides
      */
-    public final int MIN_SIDES = 2;
+    public final int minSides = 2;
     /**
      * Constant for max sides
      */
-    public final int MAX_SIDES = 100;
+    public final int maxSides = 100;
 
     private int currentValue;
     private int numSides;
@@ -29,7 +29,7 @@ public class Die {
      */
     public Die(int numSides){
         try{
-            if(numSides <= MAX_SIDES && numSides >= MIN_SIDES){
+            if(numSides <= maxSides && numSides >= minSides){
                 this.numSides = numSides;
             }
         } catch (IllegalArgumentException e) {

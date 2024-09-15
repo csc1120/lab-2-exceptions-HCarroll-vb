@@ -16,6 +16,7 @@ public class DieNotRolledException extends RuntimeException {
      * Message that not correct type is used
      * @return exception message if thrown
      */
+    @Override
     public String getMessage(){
         return "currentValue not in expected range of die";
     }
