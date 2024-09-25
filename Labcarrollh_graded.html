@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Lab 2 Feedback - carrollh-graded</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1, h2, h3 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        .commendation { color: green; }
+        .deduction { color: red; }
+        .suggestion { color: blue; }
+        .code-block { background-color: #f9f9f9; border-left: 3px solid #ccc; padding: 10px; margin: 10px 0; }
+        pre { margin: 0; }
+        .grade { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Lab 2 - Exceptions</h1>
+    <table>
+        <tr>
+            <th>Earned</th>
+            <th>Possible</th>
+            <th>Criteria</th>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>15</td>
+            <td>Intermediate Commits</td>
+        </tr>
+        <tr>
+            <td>57</td>
+            <td>60</td>
+            <td>Technical Quality (see point deductions in code)</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>15</td>
+            <td>Coding Standard Compliance and Program Clarity</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>10</td>
+            <td>Following Submission Instructions</td>
+        </tr>
+    </table>
+
+    <h2>Feedback</h2>
+    <p>Dear Hunter,</p>
+    <p>Thank you for your submission of Lab 2. Below, you'll find detailed feedback on your work. You've made a good effort, but there are several areas where improvements are necessary to enhance the correctness and robustness of your code.</p>
+
+    <h3>General Comments</h3>
+    <p><span class="commendation"><strong>Commendation:</strong></span> Your code is organized and includes comments that aid in understanding your implementation.</p>
+
+    <h2>Detailed Feedback</h2>
+
+    <h3>Die.java</h3>
+    <div class="code-block">
+        <pre>
+/*
+ * Course: CSC1020
+ * Lab 2 - Exceptions
+ * Die class
+ * Name: Hunter Carroll
+ * Last Updated: 9/11/2024
+ */
+package carrollh;
+
+/**
+ * Die class used for each individual die.
+ */
+public class Die {
+    /**
+     * Constant for minSides
+     */
+    public final int MIN_SIDES = 2;
+    /**
+     * constant for maxSides
+     */
+    public final int MAX_SIDES = 100;
+
+    private int currentValue;
+    private int numSides;
+
+    /**
+     * Constructor to instantiate the die
+     * @param numSides The number of sides of the die
+     */
+    public Die(int numSides){
+        try{
+            if(numSides <= MAX_SIDES && numSides >= MIN_SIDES){
+                this.numSides = numSides;
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Bad die creation: Illegal number of sides: " + numSides);
+        }
+    }
+
+    /**
+     * Get current value method to get current value
+     * @return the current value or DieNotRolledException
+     */
+    public int getCurrentValue(){
+        try{
+            if(currentValue <= numSides && currentValue > 0){
+                int value = currentValue;
+                currentValue = 0;
+                return value;
+            }
+        } catch(DieNotRolledException e){
+            e.getMessage();
+        }
+        currentValue = 0;
+        return 0;
+    }
+
+    /**
+     * Rolls the die.
+     */
+    public void roll(){
+        currentValue = (int)(Math.random() * numSides) + 1;
+    }
+}
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-1):</strong></span> <strong>Lines 22-28:</strong> In your constructor, the use of a <code>try-catch</code> block is incorrect. The <code>if</code> statement cannot throw an <code>IllegalArgumentException</code>, so the catch block will never be executed. Additionally, if <code>numSides</code> is outside the valid range, the constructor does not handle it appropriately, potentially leaving <code>numSides</code> uninitialized.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Validate <code>numSides</code> and explicitly throw an exception if it's out of bounds:</p>
+
+    <div class="code-block">
+        <pre>
+public Die(int numSides){
+    if(numSides &lt; MIN_SIDES || numSides &gt; MAX_SIDES){
+        throw new IllegalArgumentException("Number of sides must be between " + MIN_SIDES + " and " + MAX_SIDES + ".");
+    }
+    this.numSides = numSides;
+}
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-1):</strong></span> <strong>Lines 35-43:</strong> In your <code>getCurrentValue()</code> method, the use of a <code>try-catch</code> block is inappropriate. You should not catch <code>DieNotRolledException</code> within the same method where you intend to throw it. Additionally, the method does not throw the exception when <code>currentValue</code> is invalid, and it silently returns 0, which can lead to incorrect program behavior.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Modify the method to properly throw <code>DieNotRolledException</code> when necessary:</p>
+
+    <div class="code-block">
+        <pre>
+public int getCurrentValue() throws DieNotRolledException {
+    if(currentValue &gt; 0 && currentValue &lt;= numSides){
+        int value = currentValue;
+        currentValue = 0;
+        return value;
+    } else {
+        throw new DieNotRolledException();
+    }
+}
+        </pre>
+    </div>
+
+    <h3>DieNotRolledException.java</h3>
+    <div class="code-block">
+        <pre>
+/*
+ * Course: CSC1020
+ * Lab 2 - Exceptions
+ * DieNotRolledException class
+ * Name: Hunter Carroll
+ * Last Updated: 9/11/2024
+ */
+package carrollh;
+
+/**
+ * DieNotRolledException class to test if currentValue is in range of Die
+ */
+public class DieNotRolledException extends RuntimeException {
+
+    /**
+     * Message that not correct type is used
+     * @return exception message if thrown
+     */
+    @Override
+    public String getMessage(){
+        return "currentValue not in expected range of die";
+    }
+}
+        </pre>
+    </div>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> It's better to provide a constructor that passes the message to the superclass rather than overriding <code>getMessage()</code>:</p>
+
+    <div class="code-block">
+        <pre>
+public class DieNotRolledException extends RuntimeException {
+    public DieNotRolledException() {
+        super("currentValue not in expected range of die");
+    }
+}
+        </pre>
+    </div>
+
+    <h3>Driver.java</h3>
+    <div class="code-block">
+        <pre>
+/*
+ * Course: CSC1020
+ * Lab 2 - Exceptions
+ * Main Driver class
+ * Name: Hunter Carroll
+ * Last Updated: 9/15/2024
+ */
+package carrollh;
+
+import java.util.Scanner;
+
+/**
+ * Driver class that runs the whole program
+ */
+public class Driver {
+    /**
+     * Constant for minimum number of dice
+     */
+    public static final int MIN_DICE = 2;
+    /**
+     * Constant for max number of dice
+     */
+    public static final int MAX_DICE = 10;
+
+    /**
+     * Main class to run user input
+     * @param args that run the code
+     */
+    public static void main(String[] args) {
+        System.out.print("Please enter the number of dice to roll, ");
+        System.out.print("how many sides the dice have,");
+        System.out.println("and how many rolls to complete, separating the values by a space.");
+
+        int[] array = getInput();
+        try {
+            Die[] dieArray = createDice(array[0], array[1]);
+            int[] rolls = rollDice(dieArray, array[1], array[2]);
+            report(array[0], rolls, findMax(rolls));
+        } catch(DieNotRolledException e){
+            e.getMessage();
+        } catch(ArithmeticException e){
+            System.out.println(" ");
+        } catch(ArrayIndexOutOfBoundsException e){
+            System.out.println("Bad die creation: Illegal number of sides: " + array[1]);
+        } catch(NegativeArraySizeException e) {
+            System.out.println();
+        }
+    }
+
+    /**
+     * Grabs user input and transforms into array
+     * @return array of user input
+     */
+    private static int[] getInput(){
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter configuration:");
+        final int max = 3;
+        int[] arr = new int[max];
+        try{
+            String ans = input.nextLine();
+            arr[0] = Integer.parseInt(ans.substring(0, ans.indexOf(" ")));
+            arr[1] = Integer.parseInt(ans.substring(ans.indexOf(" ") + 1,
+                    ans.indexOf(" ", ans.indexOf(" ") + 1)));
+            arr[2] = Integer.parseInt(ans.substring(ans.indexOf(" ", ans.indexOf(" ") + 1) + 1));
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input: All values must be whole numbers.");
+        } catch(StringIndexOutOfBoundsException e) {
+            System.out.println("Invalid input: Expected 3 values but only received 2");
+        }
+        if(arr[0] &lt; MIN_DICE || arr[0] &gt; MAX_DICE) {
+            System.out.println("Invalid Input: Number of die outside expected.");
+        }
+        return arr;
+    }
+
+    // Rest of the code...
+}
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-1):</strong></span> <strong>Method <code>getInput()</code>:</strong> The input parsing using <code>substring</code> and <code>indexOf</code> is fragile and can easily break with unexpected input formats. Additionally, you don't close the <code>Scanner</code> object, which can lead to resource leaks.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Use <code>Scanner</code>'s built-in methods to parse input, such as <code>nextInt()</code>, or use <code>split()</code> to tokenize the input string:</p>
+
+    <div class="code-block">
+        <pre>
+private static int[] getInput(){
+    int[] arr = new int[3];
+    try (Scanner input = new Scanner(System.in)) {
+        System.out.print("Enter configuration: ");
+        String line = input.nextLine();
+        String[] tokens = line.trim().split("\\s+");
+        if (tokens.length != 3) {
+            System.out.println("Invalid input: Expected 3 values but received " + tokens.length);
+            return getInput(); // Prompt again
+        }
+        for (int i = 0; i &lt; 3; i++) {
+            arr[i] = Integer.parseInt(tokens[i]);
+        }
+        // Validate arr[0], arr[1], arr[2]
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input: All values must be whole numbers.");
+        return getInput(); // Prompt again
+    }
+    // Additional validation here
+    return arr;
+}
+        </pre>
+    </div>
+
+    <p><span class="deduction"><strong>Deduction (-0.5):</strong></span> <strong>Exception Handling in <code>main()</code>:</strong> The exception handling is too broad, and some catch blocks are empty or do not provide meaningful feedback to the user. For example, catching <code>ArithmeticException</code> and printing an empty string does not help the user understand what went wrong.</p>
+
+    <p><span class="suggestion"><strong>Suggestion for Improvement:</strong></span> Handle exceptions more specifically and provide informative messages. Also, avoid catching general exceptions unless necessary. Here's an example:</p>
+
+    <div class="code-block">
+        <pre>
+try {
+    // Code that may throw exceptions
+} catch (DieNotRolledException e){
+    System.out.println(e.getMessage());
+} catch (IllegalArgumentException e){
+    System.out.println(e.getMessage());
+}
+        </pre>
+    </div>
+
+    <p><span class="commendation"><strong>Commendation:</strong></span> Good job in structuring your code with helper methods like <code>createDice()</code>, <code>rollDice()</code>, and <code>report()</code>. This modular approach improves readability and maintainability.</p>
+
+    <h2>Overall Suggestions</h2>
+    <ol>
+        <li><strong>Proper Exception Handling:</strong> Ensure that exceptions are thrown and caught appropriately, providing useful feedback to the user.</li>
+        <li><strong>Input Validation:</strong> Validate user input thoroughly and handle invalid inputs gracefully.</li>
+        <li><strong>Resource Management:</strong> Close resources like <code>Scanner</code> objects to prevent resource leaks.</li>
+        <li><strong>Code Robustness:</strong> Avoid fragile parsing methods; use reliable techniques that can handle various input formats.</li>
+    </ol>
+
+    <h2>Final Grade</h2>
+    <p class="grade"><strong>Earned:</strong> 97/100</p>
+    <ul>
+        <li>Intermediate Commits: 15/15</li>
+        <li>Technical Quality: 57/60 (Deductions for exception handling and input parsing issues)</li>
+        <li>Coding Standard Compliance and Program Clarity: 15/15</li>
+        <li>Following Submission Instructions: 10/10</li>
+    </ul>
+
+    <p><strong>Overall, you've made a good effort!</strong> Keep up the good work, and consider the suggestions above to further improve your coding skills.</p>
+
+    <p>If you have any questions about this feedback(cause I am human and make mistakes) or need further clarification, please feel free to reach out.</p>
+
+    <p><em>Grader: Dr. Ukegbu</em></p>
+</body>
+</html>
